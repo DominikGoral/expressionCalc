@@ -1,0 +1,10 @@
+.Argument {
+    border: 1px solid #000;
+    border-radius: 5px;
+    background-color: #ebebeb;
+    margin-bottom: 1vh;
+}
+
+p {
+    font-size: 20px;
+}

@@ -1,0 +1,14 @@
+.Result-box {
+    width: 40%;
+    margin-top: 2vh;
+    margin-left: 30%;
+    border: 2px solid #808080;
+    border-radius: 5px;
+    padding: 10px 5px;
+}
+
+.Result-box p {
+    font-size: 20px;
+    color: red;
+}
+
