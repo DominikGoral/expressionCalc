@@ -5,7 +5,7 @@ import './Result.css'
 const result = (props) => {
     return(
         <div className='Result-box'>
-            <p>WYNIK: {props.result}</p>
+            <p>RESULT: {props.result}</p>
         </div>
     )
 }

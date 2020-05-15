@@ -18,58 +18,68 @@ class Arguments extends Component {
     }
     // this is my main function
     concatenation = (firstExpression, secondExpression) => {
+        let result = ''
         // regular expression to take single terms from expression
         const regularExpressionTermsPattern = /(([(]?[-]?(([0-9]+[.][0-9]+)|([0-9]*))[)]?[x]{1}([^][-]?((([0-9]+[.][0-9]+)|([0-9]*)))|))|[(]?[-]?(([0-9]+[.][0-9]+)|[0-9]+)[)]?)/g
         // first expression provided by user, divided into single terms
         let firstExpressionTerms = firstExpression.match(regularExpressionTermsPattern)
         // second expression provided by user, divided into single terms
         let secondExpressionTerms = secondExpression.match(regularExpressionTermsPattern)
-        // now I will compare every term from first expression with every term from second expression
-        for(let i = 0; i < firstExpressionTerms.length; i++) {
-            // check exponent of first compared value
-            let firstExpressionExponent = this.takeExponent(firstExpressionTerms[i].toString())
-            
-            for(let j = 0; j < secondExpressionTerms.length; j++) {
-                // this condition check whether compared value from secondExpressionTerms isn' t 0
-                if(secondExpressionTerms[j] !== 0) {
-                    // check exponent of second compared value
-                    let secondExpressionExponent = this.takeExponent(secondExpressionTerms[j].toString())
-                    // this condition check whether exponents of compared terms are equal
-                    if(firstExpressionExponent === secondExpressionExponent) {
-                        // take coefficient values for actually compared terms
-                        let firstExpressionCoefficient = this.takeCoefficient(firstExpressionTerms[i].toString())
-                        let secondExpressionCoefficient = this.takeCoefficient(secondExpressionTerms[j].toString())
-                        // here we are counting new coefficient
-                        let newCoefficent = parseFloat(firstExpressionCoefficient) + parseFloat(secondExpressionCoefficient)
-
-                        let newFirstExpressionTerms = ''
-                        // this condition check whether our actually term is only number, only x, or more complex term like 2x^-2.3
-                        // according to situation I create updated value of term which I'm going to use to replace old value
-                        if(firstExpressionTerms[i].includes("x^")) {
-                            newFirstExpressionTerms = newCoefficent.toString() + 'x^' + firstExpressionExponent
-                        } else if(firstExpressionTerms[i].includes("x")) {
-                            newFirstExpressionTerms = newCoefficent.toString() + 'x'
-                        } else {
-                            newFirstExpressionTerms = newCoefficent.toString()
-                        }
-                        // replacing old terms. New term have updated coefficient value
-                        firstExpressionTerms[i] = newFirstExpressionTerms
-                        // and in order to don' t use this value again I assign 0. That's why the first condition in this loop is if(secondExpressionTerms[j] !== 0)
-                        // because if value was added, we can' t do it again
-                        secondExpressionTerms[j] = 0
-                    }
-                }
+        // if we provided arguments are like 'dasdadfsbhjwfwy', so it doesnt match to regular expression pattern
+        if(firstExpressionTerms === null || secondExpressionTerms === null) {
+            result = 'Provided arguments are not correct'
+            this.setState({ result: result })
+            return result
+        } else {
+            // now I will compare every term from first expression with every term from second expression
+            for(let i = 0; i < firstExpressionTerms.length; i++) {
+                // check exponent of first compared value
+                let firstExpressionExponent = this.takeExponent(firstExpressionTerms[i].toString())
                 
+                for(let j = 0; j < secondExpressionTerms.length; j++) {
+                    // this condition check whether compared value from secondExpressionTerms isn' t 0
+                    if(secondExpressionTerms[j] !== 0) {
+                        // check exponent of second compared value
+                        let secondExpressionExponent = this.takeExponent(secondExpressionTerms[j].toString())
+                        // this condition check whether exponents of compared terms are equal
+                        if(firstExpressionExponent === secondExpressionExponent) {
+                            // take coefficient values for actually compared terms
+                            let firstExpressionCoefficient = this.takeCoefficient(firstExpressionTerms[i].toString())
+                            let secondExpressionCoefficient = this.takeCoefficient(secondExpressionTerms[j].toString())
+                            // here we are counting new coefficient
+                            let newCoefficent = parseFloat(firstExpressionCoefficient) + parseFloat(secondExpressionCoefficient)
+    
+                            let newFirstExpressionTerms = ''
+                            // this condition check whether our actually term is only number, only x, or more complex term like 2x^-2.3
+                            // according to situation I create updated value of term which I'm going to use to replace old value
+                            if(firstExpressionTerms[i].includes("x^")) {
+                                newFirstExpressionTerms = newCoefficent.toString() + 'x^' + firstExpressionExponent
+                            } else if(firstExpressionTerms[i].includes("x")) {
+                                newFirstExpressionTerms = newCoefficent.toString() + 'x'
+                            } else {
+                                newFirstExpressionTerms = newCoefficent.toString()
+                            }
+                            // replacing old terms. New term have updated coefficient value
+                            firstExpressionTerms[i] = newFirstExpressionTerms
+                            // and in order to don' t use this value again I assign 0. That's why the first condition in this loop is if(secondExpressionTerms[j] !== 0)
+                            // because if value was added, we can' t do it again
+                            secondExpressionTerms[j] = 0
+                        }
+                    }
+                    
+                }
             }
-        }
-        // this loop is checking whether we have values in secondExpressionTerms array which exponents wasn' t equal to any exponents from firstExpressionTerms values array
-        for(let i = 0; i < secondExpressionTerms.length; i++) {
-            if(secondExpressionTerms[i] !== 0) {
-                firstExpressionTerms.push(secondExpressionTerms[i])
+            // this loop is checking whether we have values in secondExpressionTerms array which exponents wasn' t equal to any exponents from firstExpressionTerms values array
+            for(let i = 0; i < secondExpressionTerms.length; i++) {
+                if(secondExpressionTerms[i] !== 0) {
+                    firstExpressionTerms.push(secondExpressionTerms[i])
+                }
             }
+            result = firstExpressionTerms.join(' + ')
+            // before showing result I join the firstExpressionTerms values by ' + '
+            this.setState({ result: result })
+            return result
         }
-        // before showing result I join the firstExpressionTerms values by ' + '
-        this.setState({ result: firstExpressionTerms.join(' + ') })
     }
     // takeExponent and takeCoefficient are two ancillary functions
     takeExponent = (expression) => {
@@ -125,8 +135,8 @@ class Arguments extends Component {
                 <div className='ControlPanel'>
                     <input type='text' value={this.state.firstExpression} onChange={e => this.setState({ firstExpression: e.target.value })}/>
                     <input type='text' value={this.state.secondExpression} onChange={e => this.setState({ secondExpression: e.target.value })}/>
-                    <Button  clicked={this.removeAllExpressions}>Reset wyrażeń</Button>
-                    <Button  clicked={() => this.concatenation(this.state.firstExpression, this.state.secondExpression)}>Wynik</Button>
+                    <Button  clicked={this.removeAllExpressions}>Reset</Button>
+                    <Button  clicked={() => this.concatenation(this.state.firstExpression, this.state.secondExpression)}>Result</Button>
                 </div>
                 <Result result={this.state.result}/>
             </Aux>
