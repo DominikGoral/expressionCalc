@@ -50,14 +50,26 @@ class Arguments extends Component {
                             let newCoefficent = parseFloat(firstExpressionCoefficient) + parseFloat(secondExpressionCoefficient)
     
                             let newFirstExpressionTerms = ''
-                            // this condition check whether our actually term is only number, only x, or more complex term like 2x^-2.3
-                            // according to situation I create updated value of term which I'm going to use to replace old value
-                            if(firstExpressionTerms[i].includes("x^")) {
-                                newFirstExpressionTerms = newCoefficent.toString() + 'x^' + firstExpressionExponent
-                            } else if(firstExpressionTerms[i].includes("x")) {
-                                newFirstExpressionTerms = newCoefficent.toString() + 'x'
+                            // if we have 0 coefficients we don' t want to have result like 0x^2
+                            if(newCoefficent === 0) {
+                                newFirstExpressionTerms = 0
                             } else {
-                                newFirstExpressionTerms = newCoefficent.toString()
+                                // to don' t have -1x or 1x, but -x and x 
+                                if(newCoefficent === 1) {
+                                    newCoefficent = ''
+                                }
+                                if(newCoefficent === -1) {
+                                    newCoefficent = '-'
+                                }
+                                // this condition check whether our actually term is only number, only x, or more complex term like 2x^-2.3
+                                // according to situation I create updated value of term which I'm going to use to replace old value
+                                if(firstExpressionTerms[i].includes("x^")) {
+                                    newFirstExpressionTerms = newCoefficent.toString() + 'x^' + firstExpressionExponent
+                                } else if(firstExpressionTerms[i].includes("x")) {
+                                    newFirstExpressionTerms = newCoefficent.toString() + 'x'
+                                } else {
+                                    newFirstExpressionTerms = newCoefficent.toString()
+                                }
                             }
                             // replacing old terms. New term have updated coefficient value
                             firstExpressionTerms[i] = newFirstExpressionTerms
@@ -69,13 +81,20 @@ class Arguments extends Component {
                     
                 }
             }
+            // this loop is adding values to finalArray which haven' t 0 coefficient in firstExpressionTerms array
+            let finalArray = []
+            for(let i = 0; i < firstExpressionTerms.length; i++) {
+                if(firstExpressionTerms[i] !== 0) {
+                    finalArray.push(firstExpressionTerms[i])
+                }
+            }
             // this loop is checking whether we have values in secondExpressionTerms array which exponents wasn' t equal to any exponents from firstExpressionTerms values array
             for(let i = 0; i < secondExpressionTerms.length; i++) {
                 if(secondExpressionTerms[i] !== 0) {
-                    firstExpressionTerms.push(secondExpressionTerms[i])
+                    finalArray.push(secondExpressionTerms[i])
                 }
             }
-            result = firstExpressionTerms.join(' + ')
+            result = finalArray.join(' + ')
             // before showing result I join the firstExpressionTerms values by ' + '
             this.setState({ result: result })
             return result
@@ -108,8 +127,18 @@ class Arguments extends Component {
         } else if(indexOfVariable > 0) {
             // if coefficient is negative value, because user should provide it in brackets
             if(expression[0] === '(') {
-                coefficient = expression.slice(1, indexOfVariable - 1)
+                // for something like (-)x, so when we -x after +
+                if(expression[1] === '-' && expression[2] === ')') {
+                    coefficient = -1
+                // for any other negative value, like (-2)x
+                } else {
+                    coefficient = expression.slice(1, indexOfVariable - 1)
+                }
             // if coefficient is positive value 
+            // something like -x
+            } else if(expression[0] === '-') {
+                coefficient = -1
+            // any other values
             } else {
                 coefficient = expression.slice(0, indexOfVariable)
             }
